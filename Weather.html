@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Weather</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 50px;
+            transition: background-color 0.5s;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        #info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Alliance Weather</h1>
+    <input type="text" id="cityInput" placeholder="City name">
+    <button onclick="getWeather()">Show Weather</button>
+
+    <div id="info">
+        <p id="location"></p>
+        <p id="temp"></p>
+        <p id="humid"></p>
+        <p id="wind"></p>
+        <p id="condition"></p>
+    </div>
+
+    <script>
+        const apiKey = "5683ef62f0bb6a59d0f2ef4e84945ac2";
+
+        function getWeather() {
+            const city = document.getElementById("cityInput").value;
+            if (!city) {
+                alert("Please enter a city name");
+                return;
+            }
+
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.cod !== 200) {
+                        alert("City not found");
+                        return;
+                    }
+
+                    document.getElementById("location").textContent = "Location: " + data.name;
+                    document.getElementById("temp").textContent = "Temperature: " + data.main.temp + "°C";
+                    document.getElementById("humid").textContent = "Humidity: " + data.main.humidity + "%";
+                    document.getElementById("wind").textContent = "Wind Speed: " + data.wind.speed + " m/s";
+                    document.getElementById("condition").textContent = "Condition: " + data.weather[0].main;
+
+                    changeBackground(data.weather[0].main.toLowerCase());
+                })
+                .catch(() => {
+                    alert("Error fetching weather data");
+                });
+        }
+
+        function changeBackground(condition) {
+            let color = "#f0f0f0";
+            if (condition.includes("clear")) color = "#ffe680";
+            else if (condition.includes("cloud")) color = "#cccccc";
+            else if (condition.includes("rain")) color = "#a3c4dc";
+            else if (condition.includes("snow")) color = "#ffffff";
+            else if (condition.includes("mist") || condition.includes("fog")) color = "#dcdcdc";
+            else if (condition.includes("thunderstorm")) color = "#9999cc";
+
+            document.body.style.backgroundColor = color;
+        }
+    </script>
+</body>
+</html>
